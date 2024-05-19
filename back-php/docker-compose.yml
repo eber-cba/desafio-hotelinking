@@ -1,0 +1,40 @@
+services:  # Definición de servicios
+  app:  # Servicio de la aplicación Laravel
+    build:
+      context: .  # Contexto de construcción, es decir, la raíz del proyecto
+      dockerfile: Dockerfile  # Archivo Dockerfile que se utilizará para construir la imagen
+    container_name: laravel_app  # Nombre del contenedor de la aplicación Laravel
+    restart: unless-stopped  # Política de reinicio del contenedor
+    working_dir: /var/www/html  # Directorio de trabajo dentro del contenedor
+    volumes:
+      - ./:/var/www/html  # Monta el directorio actual en /var/www/html dentro del contenedor
+    ports:
+      - "8000:80"  # Mapea el puerto 80 del contenedor al puerto 8000 del host
+    networks:
+      - app-network  # Red definida para los servicios
+    depends_on:
+      - db  # Este servicio depende del servicio de base de datos
+
+  db:  # Servicio de la base de datos MySQL
+    image: mysql:8.0  # Imagen de Docker que se usará para MySQL
+    container_name: laravel_db  # Nombre del contenedor de la base de datos MySQL
+    restart: unless-stopped  # Política de reinicio del contenedor
+    environment:  # Variables de entorno para configurar MySQL
+      MYSQL_ROOT_PASSWORD: 0529
+      MYSQL_DATABASE: desafio_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 0529
+    volumes:
+      - dbdata:/var/lib/mysql  # Volumen para persistir los datos de MySQL
+    ports:
+      - "3307:3306"  # Mapea el puerto 3306 del contenedor al puerto 3306 del host
+    networks:
+      - app-network  # Red definida para los servicios
+
+networks:  # Definición de la red
+  app-network:
+    driver: bridge  # Tipo de red (bridge es el predeterminado)
+
+volumes:  # Definición de volúmenes
+  dbdata:
+    driver: local  # Tipo de volumen (local es el predeterminado)
